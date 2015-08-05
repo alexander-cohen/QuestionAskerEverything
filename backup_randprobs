@@ -1,0 +1,50 @@
+    def num_nongreater_probs(self, p, pdist):
+        return len(np.where(pdist <= p)[0])
+    
+    def num_lower_probs(self, p, pdist):
+        return len(np.where(pdist < p)[0])
+    
+    def num_equal_probs(self, p, pdist):
+        return len(np.where(pdist == p)[0])
+    
+    def prob_guess_item(self, item, p, pdist, numties, numless):
+        tot_prob = 0
+        len_dist = len(pdist)
+        
+        possible_ties = range(max(1, self.num_item_rand - (numless)), min(numties+1, self.num_item_rand+1))
+        try:
+            ways_to_get_ties = [float(ncr(numties, i) * ncr(numless, self.num_item_rand - i)) for i in possible_ties]
+        except:
+            print numties, i, self.num_item_rand, numless
+        ways_tot = float(sum(ways_to_get_ties))
+        for ways, i in zip(ways_to_get_ties, possible_ties):
+            tot_prob += (1.0 / float(i)) * (ways / ways_tot)
+            
+        return tot_prob
+        
+    def prob_win_if_item(self, item, p, pdist):
+        
+        try: 
+            numties = self.num_equal_probs(p, pdist)
+            numless = self.num_lower_probs(p, pdist)
+            numnongreater = self.num_nongreater_probs(p, pdist)
+            return self.prob_guess_item(item, p, pdist, numties, numless) * \
+                    (float(ncr(numnongreater, self.num_item_end_left)) / \
+                        float(ncr(len(pdist), self.num_item_end_left)))
+        except:
+            return 0
+        
+    def prob_win_if_end(self, probdistr): #probability that a higher prob object is there
+        prob_win = 0
+        num = len(probdistr)
+        for i, p in zip(range(1000), probdistr): #in case of tie, guess random
+            #print ncr(len(np.where(self.probabilities < p)[0]), 19)
+            prob_win += p * self.prob_win_if_item(i, p, probdistr)
+        return prob_win
+
+    
+    def expected_prob_win(self, feature):
+        epw = 0
+        for i in range(5):
+            epw += self.prob_response(feature, index_to_prob(i)) * self.prob_win_if_end(self.prob_with_new_knowledge((feature, index_to_prob(i))))
+        return  epw 

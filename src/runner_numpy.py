@@ -5,9 +5,8 @@ Created on Jul 4, 2015
 '''
 import numpy as np
 from scipy.stats import entropy
-import pickle
+import cPickle as pickle
 import math
-from matplotlib import pyplot as plt
 
 data_matrix = np.loadtxt("../data/intel_dat.txt")
 
@@ -48,7 +47,7 @@ full_probability_matrix_madeup = [[0.60, 0.25, 0.09, 0.04, 0.02 ],
                                   [0.02, 0.04, 0.09, 0.25, 0.60 ]]
 
 all_probs = [np.zeros(np.shape(data_matrix)) for x in range(5)]
-
+'''
 for i in range(5):
     p = (float(i)/2.0) - 1.0
     
@@ -59,11 +58,10 @@ for i in range(5):
 
 all_probs = np.array(all_probs)
 all_probs.dump("../pickled_data/data_probs.pickle")
-
+'''
 with open("../pickled_data/data_probs.pickle", 'r') as d_probs:
-    data_probs = pickle.load(d_probs)
+    data_probs_temp = pickle.load(d_probs)
 
-print np.shape(data_probs)
 
 num_items_tot = len(items)
 
@@ -79,7 +77,7 @@ def index_to_prob(index):
 
 
 
-class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
+class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
     def __init__(self):
         self.items_left = range(len(items)) #list of items that can be guessed
         self.items_guessed = [] #list of items that have been guessed
@@ -98,21 +96,24 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
         
         self.knowledge = [] #will add feature/response pairs
         
+        self.data_probs = data_probs_temp
+        
         self.entropy = entropy(self.probabilities) #entropy of distribution
         self.cur_money = 2.0
         self.money_deplete = 0.5
         self.num_item_rand = 20
         self.num_item_end_left = self.num_item_rand-1
+        
         self.update_all() #updates all information
         
     def prob_knowledge_from_item(self, item):
-        item_probs = data_probs[:, item] #a 2D slice of the array, rows being prob and column being feature
+        item_probs = self.data_probs[:, item] #a 2D slice of the array, rows being prob and column being feature
         return np.prod( np.fromiter((item_probs[prob_to_index(r)][f] for f, r in self.knowledge), np.float64)) * \
                 self.prior_prob
         
     def get_prob_knowledge_from_items(self):
         return np.fromiter( ((self.prob_knowledge_from_item(item)) for item in self.items_left ), np.float64)
-        
+
     def update_all(self):
         self.num_items_left = len(self.items_left)
         self.prior_prob = 1.0 / self.num_items_left
@@ -120,8 +121,8 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
         self.prob_knowledge_from_items = self.get_prob_knowledge_from_items()
         self.prob_knowledge_overall = np.sum(self.prob_knowledge_from_items)
         
-        
-#         if len(self.items_guessed) > 0: self.prob_knowledge_from_items[np.array(self.items_guessed)] = 0
+    
+        if len(self.items_guessed) > 0: self.prob_knowledge_from_items[np.array(self.items_guessed)] = 0
         
         
         
@@ -129,40 +130,44 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
         
         self.entropy = entropy(self.probabilities)
         
-    def entropy_with_new_knowledge(self, new_knowledge):
+            
+    def prob_with_new_knowledge(self, new_knowledge):
         feature, response = new_knowledge
-
-        prob_response_for_animal = data_probs[prob_to_index(response), :, feature] #2d slice, row is prob col is animal
-
+        
+        prob_response_for_animal = self.data_probs[prob_to_index(response), :, feature] #2d slice, row is prob col is animal
+        
         new_prob_knowledge_from_items = self.prob_knowledge_from_items * \
                                                np.fromiter(  (prob_response_for_animal[o]  for o in self.items_left), np.float64)
                                                 
         new_prob_knowledge_overall = np.sum(new_prob_knowledge_from_items)
-
-        ent =  entropy(new_prob_knowledge_from_items/new_prob_knowledge_overall) 
+        
+        return new_prob_knowledge_from_items/new_prob_knowledge_overall
+        
+    def entropy_with_new_knowledge(self, new_knowledge):
+        ent =  entropy(self.prob_with_new_knowledge(new_knowledge)) 
         return self.entropy if math.isinf(ent) else ent
         
     def prob_response(self, feature, val):
-        prob_of_val = data_probs[prob_to_index(val), self.items_left, feature]
+        prob_of_val = self.data_probs[prob_to_index(val), self.items_left, feature]
         return np.sum(self.probabilities * prob_of_val)
         
-    def expected_info_gain(self, feature):
+    def expected_gain(self, feature):
         eig = 0
         for i in range(5):
             eig += self.prob_response(feature, index_to_prob(i)) * self.info_gain_ent(self.entropy_with_new_knowledge((feature, index_to_prob(i))))
         return  eig
                                                             
-    def expected_info_gains(self):
+    def expected_gains(self):
         return_arr = []
         for f in self.features_left:
-            return_arr.append(self.expected_info_gain(f))
+            return_arr.append(self.expected_gain(f))
         return np.nan_to_num(np.array(return_arr))                                                 
                                                             
     def get_best_feature(self):
-        return self.features_left[np.argmax(self.expected_info_gains())] 
+        return self.features_left[np.argmax(self.expected_gains())] 
     
     def get_best_feature_and_gain(self):
-        gains = self.expected_info_gains()
+        gains = self.expected_gains()
         best_indx = np.argmax(gains)
         return self.features_left[best_indx], gains[best_indx] 
     
@@ -172,19 +177,16 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
         self.update_all()
         
     def ordered_features_name_and_gain_str(self):
-        info_gains = self.expected_info_gains()
+        info_gains = self.expected_gains()
         ordered_names = [features[self.features_left[f]] for f in np.argsort(info_gains)[::-1]]
         return ":".join(ordered_names) + "," + ":".join([str(elem) for elem in list(np.sort(info_gains)[::-1])])
               
     def finish(self, choices):
-        dummie = Player()
         for k in self.knowledge:
-            dummie.knowledge.append(k)
-            dummie.update_all()
             print '\n\n***************\nFeature:', features[k[0]], ', Your response:', k[1]
             for o in choices:
                 try:
-                    print 'For', o.upper(), ':', data_matrix[items.index(o.lower()), k[0]], 'prob:', dummie.probabilities[items.index(o.lower())]
+                    print 'For', o.upper(), ':', data_matrix[items.index(o.lower()), k[0]]
                 except:
                     pass
               
@@ -213,39 +215,59 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
                 
             else:
                 continue
+
     
-    def prob_with_new_knowledge(self, new_knowledge):
-        feature, response = new_knowledge
+    def helper_str(self, best_feature):
+        prob_responses = [self.prob_response(best_feature, 1.0),
+                  self.prob_response(best_feature, 0.5),
+                  self.prob_response(best_feature, 0.0),
+                  self.prob_response(best_feature, -0.5),
+                  self.prob_response(best_feature, -1.0)]
         
-        prob_response_for_animal = data_probs[prob_to_index(response), :, feature] #2d slice, row is prob col is animal
-        
-        new_prob_knowledge_from_items = self.prob_knowledge_from_items * \
-                                               np.fromiter(  (prob_response_for_animal[o]  for o in self.items_left), np.float64)
-                                                
-        new_prob_knowledge_overall = np.sum(new_prob_knowledge_from_items)
-        
-        return new_prob_knowledge_from_items/new_prob_knowledge_overall
     
-    def expected_prob_win(self, feature):
-        epw = 0
-        for i in range(5):
-            epw += self.prob_response(feature, index_to_prob(i)) * self.prob_win_if_end(self.prob_with_new_knowledge((feature, index_to_prob(i))))
-        return  epw 
-    
-    def iterate(self):
-        print self
-        #best_feature, gain = self.get_best_feature_and_gain()
-        gains = self.expected_info_gains()
-        best_feature = self.features_left[np.argmax(self.expected_info_gains())] 
-        gain = np.max(gains)
-    
-        fig, ax = plt.subplots()
-        plt.hist(self.probabilities, np.arange(0, 21.0*np.max(self.probabilities)/20.0 + 0.001, np.max(self.probabilities)/20.0), log=True)
-        plt.show()
+        info_gains = [self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 1.0))),
+                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 0.5))),
+                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 0.0))),
+                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, -0.5))),
+                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, -1.0)))]
         
-        print "Best gain: ", gain
-        prob_win = self.prob_win_if_end(self.probabilities)
-        ''' #percentage threshold
+        
+        expected_gains = list(np.array(prob_responses)*np.array(info_gains))
+        
+        
+        helper_str = "eig = " + str(self.expected_gain(best_feature)) + ':\n'\
+                        '   y = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[0], info_gains[0], expected_gains[0]) + '\n' \
+                        '  py = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[1], info_gains[1], expected_gains[1]) + '\n' \
+                        '   u = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[2], info_gains[2], expected_gains[2]) + '\n' \
+                        '  pn = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[3], info_gains[3], expected_gains[3]) + '\n' \
+                        '   n = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[4], info_gains[4], expected_gains[4]) + '\n'   
+        
+        return helper_str
+        
+    def query_person_indx(self, feat, itm = None):
+        while True:
+            resp = raw_input(str(self.question_num) + "). " + features[feat] + ' (y/py/u/pn/n/end): ')
+            if resp == 'y': return 1.0
+            elif resp == 'py': return 0.5
+            elif resp == 'u': return 0.0
+            elif resp == 'pn': return -0.5
+            elif resp == 'n': return -1.0
+            elif resp.split(',')[0] == 'end': 
+                self.finish(resp.split(',')[1:])
+                continue
+            
+    def query_dat_indx(self, feat, itm = None):
+        resp = data_matrix[itm, feat]
+        resp_char = {-1.0:'n', -0.5:'pn', 0.0:'u', 0.5:'py', 1.0:'y'}[resp]
+        print str(self.question_num) + "). " + features[feat] + ' (y/py/u/pn/n/end): ' + resp_char
+        return resp
+    
+    def query_dat_name(self, feat, itm = None):
+        return self.query_dat_indx(feat, items.index(itm))
+        
+    def guess_threshes(self):
+        ''' 
+        #percentage threshold
         for o_indx, p in zip(range(1000), self.probabilities):
             probs_without = np.array(list(self.probabilities)[:o_indx] + list(self.probabilities)[o_indx+1:])
             probs_without /= np.sum(probs_without)
@@ -258,7 +280,8 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
                 if self.guess_object(o_indx): return
                 else: self.iterate()
         '''
-        ''' #prob win limit
+        ''' 
+        #prob win limit
         if prob_win * self.cur_money > \
             self.expected_prob_win(best_feature) * (self.cur_money - self.money_deplete):
             self.question_num += 1
@@ -267,107 +290,47 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
                 self.update_all()
                 self.iterate()
         '''
-        prob_responses = [self.prob_response(best_feature, 1.0),
-                          self.prob_response(best_feature, 0.5),
-                          self.prob_response(best_feature, 0.0),
-                          self.prob_response(best_feature, -0.5),
-                          self.prob_response(best_feature, -1.0)]
         
-    
-        info_gains = [self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 1.0))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 0.5))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 0.0))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, -0.5))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, -1.0)))]
-        
-        
-        expected_gains = list(np.array(prob_responses)*np.array(info_gains))
-        
-        
-        helper_str = "eig = " + str(self.expected_info_gain(best_feature)) + ':\n'\
-                        '   y = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[0], info_gains[0], expected_gains[0]) + '\n' \
-                        '  py = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[1], info_gains[1], expected_gains[1]) + '\n' \
-                        '   u = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[2], info_gains[2], expected_gains[2]) + '\n' \
-                        '  pn = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[3], info_gains[3], expected_gains[3]) + '\n' \
-                        '   n = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[4], info_gains[4], expected_gains[4]) + '\n'                                                                                                                                                                                         
-                                                                    
-        while True:
-                        
-            response = raw_input(helper_str + "\n" + str(self.question_num) + "). " + features[best_feature].upper() + \
-                                 " (y/py/u/pn/n or end,item1,item2,item3...): ")
-            if response == 'y':
-                self.knowledge.append((best_feature, 1))
-                
-            elif response == 'n':
-                self.knowledge.append((best_feature, -1))
-                
-            elif response == 'py':
-                self.knowledge.append((best_feature, 0.5))
-                
-            elif response == 'pn':
-                self.knowledge.append((best_feature, -0.5))
-            
-            elif response == 'u':
-                self.knowledge.append((best_feature, 0.0))
-            
-            elif response.split(',')[0] == 'end':
-                return self.finish(response.split(',')[1:])
-                return
-            
-            else:
-                continue
-            break
+    def iterate(self, query_func = None, itm = None):
+        if query_func == None: query_func = self.query_person_indx
+        print self
+        #best_feature, gain = self.get_best_feature_and_gain()
+        gains = self.expected_gains()
+              
+        best_feature = self.features_left[np.argmax(gains)] 
+  
+        gain = np.max(gains)
+
+        print "Best gain: ", gain
+        print self.helper_str(best_feature)
+        resp = query_func(best_feature, itm)
+        self.knowledge.append((best_feature, resp))    
+
         self.features_left.remove(best_feature)
         self.question_num += 1
         self.update_all()
-        self.iterate()
+        return best_feature, gains / np.sum(gains)
         
-    def num_nongreater_probs(self, p, pdist):
-        return len(np.where(pdist <= p)[0])
+    def play_game(self):
+        while True:
+            self.iterate()
     
-    def num_lower_probs(self, p, pdist):
-        return len(np.where(pdist < p)[0])
-    
-    def num_equal_probs(self, p, pdist):
-        return len(np.where(pdist == p)[0])
-    
-    def prob_guess_item(self, item, p, pdist, numties, numless):
-        tot_prob = 0
-        len_dist = len(pdist)
-        
-        possible_ties = range(max(1, self.num_item_rand - (numless)), min(numties+1, self.num_item_rand+1))
-        try:
-            ways_to_get_ties = [float(ncr(numties, i) * ncr(numless, self.num_item_rand - i)) for i in possible_ties]
-        except:
-            print numties, i, self.num_item_rand, numless
-        ways_tot = float(sum(ways_to_get_ties))
-        for ways, i in zip(ways_to_get_ties, possible_ties):
-            tot_prob += (1.0 / float(i)) * (ways / ways_tot)
+    def play_game_computer(self, itm = 'dog', depth = 20):
+        for i in range(depth):
+            self.iterate(self.query_dat_name, itm)
             
-        return tot_prob
+    def computer_iterate(self, itm = 'dog'):
+        return self.iterate(self.query_dat_name, itm)
         
-    def prob_win_if_item(self, item, p, pdist):
-        
-        try: 
-            numties = self.num_equal_probs(p, pdist)
-            numless = self.num_lower_probs(p, pdist)
-            numnongreater = self.num_nongreater_probs(p, pdist)
-            return self.prob_guess_item(item, p, pdist, numties, numless) * \
-                    (float(ncr(numnongreater, self.num_item_end_left)) / \
-                        float(ncr(len(pdist), self.num_item_end_left)))
-        except:
-            return 0
-        
-    def prob_win_if_end(self, probdistr): #probability that a higher prob object is there
-        prob_win = 0
-        num = len(probdistr)
-        for i, p in zip(range(1000), probdistr): #in case of tie, guess random
-            #print ncr(len(np.where(self.probabilities < p)[0]), 19)
-            prob_win += p * self.prob_win_if_item(i, p, probdistr)
-        return prob_win
+    def get_ordered_feats(self):
+        return [self.features_left[f] for f in reversed(np.argsort(self.expected_gains()))] 
+    
+    def get_normed_gains(self):
+        gains = self.expected_gains()
+        return gains / np.sum(gains)
         
     def ordered_features_indx(self):
-        return np.array([self.features_left[f] for f in np.argsort(self.expected_info_gains())[::-1]])
+        return np.array([self.features_left[f] for f in np.argsort(self.expected_gains())[::-1]])
         
     def ordered_features_name(self):
         return [features[f] for f in self.ordered_features_indx()]
@@ -377,65 +340,10 @@ class Player(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
         to_print_probs = repr([(item, "{:.3}%".format(prob*100)) for item, prob in ordered][:10])
         return "\nProbabilities: " + to_print_probs + "\n" \
                 "Entropy: " + str(self.entropy) + '\n' +\
-                "Questions asked: " + str(self.question_num) + '\n' + \
-                "Prob win: " + str(self.prob_win_if_end(self.probabilities))
-        
-class ComputerPlayer(Player):
-    def __init__(self, item):
-        super(ComputerPlayer, self).__init__()
-        self.item = item
-        self.item_indx = items.index(item)
-        self.item_row = data_matrix[self.item_indx]
-    
-    def iterate(self):
-        #print self
-        best_feature, gain = self.get_best_feature_and_gain()
-        #print "Best gain: ", gain
+                "Questions asked: " + str(self.question_num)
 
-                
-        prob_responses = [self.prob_response(best_feature, 1.0),
-                          self.prob_response(best_feature, 0.5),
-                          self.prob_response(best_feature, 0.0),
-                          self.prob_response(best_feature, -0.5),
-                          self.prob_response(best_feature, -1.0)]
-        
-    
-        info_gains = [self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 1.0))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 0.5))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, 0.0))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, -0.5))),
-                      self.info_gain_ent(self.entropy_with_new_knowledge((best_feature, -1.0)))]
-        
-        
-        expected_gains = list(np.array(prob_responses)*np.array(info_gains))
-        
-        
-        helper_str = "eig = " + str(self.expected_info_gain(best_feature)) + ':\n'\
-                        '   y = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[0], info_gains[0], expected_gains[0]) + '\n' \
-                        '  py = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[1], info_gains[1], expected_gains[1]) + '\n' \
-                        '   u = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[2], info_gains[2], expected_gains[2]) + '\n' \
-                        '  pn = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[3], info_gains[3], expected_gains[3]) + '\n' \
-                        '   n = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[4], info_gains[4], expected_gains[4]) + '\n'                                                                                                                                                                                         
-                            
-                                                
-        resp = self.item_row[best_feature]         
-        print '------>', self.item, features[best_feature], resp                                                                                                                           
-        self.knowledge.append((best_feature, resp))
-   
-        
-        self.features_left.remove(best_feature)
-        self.question_num += 1
-        self.update_all()
-        self.iterate()
-        
-def get_for_depth_and_obj(obj, depth):
-    player = ComputerPlayer(obj)
-    for i in range(depth): player.iterate()
-    
-    k = [[k1, k2] for k1, k2 in player.knowledge]
-   
-    return '{},{},{}\n'.format(items.index(obj), depth, str(k))
-
-player = Player()
+'''
+player = OptimalPlayer()
 print player.ordered_features_name_and_gain_str()
 player.iterate()
+'''

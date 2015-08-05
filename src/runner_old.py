@@ -76,7 +76,7 @@ for k, v in sorted(new_dict.items(), key=lambda x: x[0]):
                             0.5 :  7.0%
                             1.0 : 12.0%
 '''
-class Player:
+class OptimalPlayer:
     def __init__(self):     
         
         _, self.data_dict, all_features, all_objects = data_loader.get_data()
@@ -322,9 +322,9 @@ class Player:
             
             self.questions_asked += 1
      
-class ComputerPlayer(Player):
+class ComputerPlayer(OptimalPlayer):
     def __init__(self, the_object):
-        Player.__init__(self)
+        OptimalPlayer.__init__(self)
         self.object = the_object
         
     def get_response(self, feature):
@@ -343,7 +343,7 @@ class ComputerPlayer(Player):
     
         return the_input
 
-my_player = Player()
+my_player = OptimalPlayer()
 my_player.play_game()
 
 data_logger.close()

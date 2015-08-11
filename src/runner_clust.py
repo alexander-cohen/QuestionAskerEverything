@@ -5,7 +5,7 @@ Created on Jul 28, 2015
 '''
 from runner_numpy import *
     
-with open("../data/all_clusts_matrices2.pickle") as acm:
+with open("../data/all_clusts_matrices5.pickle") as acm:
     all_clust_matrix = pickle.load(acm)
 
 feature_blacklist = []
@@ -32,19 +32,22 @@ class ClustPlayer(OptimalPlayer): #ALL itemS AND FEATURES WILL BE REFERRED TO BY
         self.clusts = None
         self.load_new_prob_matrix(clusts)
         super(ClustPlayer, self).__init__()
-        
+        self.load_new_prob_matrix(clusts)
         self.update_all()
         
     def load_new_prob_matrix(self, clust_indx):
         self.clusts_index = all_clust_matrix[clust_indx][0]
         self.clusts = [np.where(np.array(self.clusts_index) == val)[0] for val in list(set(self.clusts_index))]
         self.data_probs = np.zeros((5, len(items), len(features)))
+        
         for c in self.clusts:
-            print [items[i] for i in c]
+            pass
+            #print [items[i] for i in c]
+
         self.clusts_index = np.array(self.clusts_index)
         self.clusts_index -= np.min(self.clusts_index)
         self.data_probs_clust = np.array(all_clust_matrix[clust_indx][1])
-        for i, c in zip(range(1000), self.clusts_index):
+        for i, c in zip(range(len(items)), self.clusts_index):
             self.data_probs[:,i,:] = self.data_probs_clust[:,c,:]
         
  
@@ -75,6 +78,8 @@ class ClustPlayer(OptimalPlayer): #ALL itemS AND FEATURES WILL BE REFERRED TO BY
         
         return new_prob_knowledge_from_items/new_prob_knowledge_overall
  
+    
+ 
     def update_all(self):
         self.num_items_left = float(len(self.clusts))
         self.prior_prob = 1.0 / self.num_items_left
@@ -96,5 +101,5 @@ player.iterate()
 '''
 '''
 player = ClustPlayer(3)
-player.iterate()
+player.play_game()
 '''

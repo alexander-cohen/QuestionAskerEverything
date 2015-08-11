@@ -26,6 +26,8 @@ def ncr(n, r):
     denom = reduce(op.mul, xrange(1, r+1))
     return numer//denom
 
+print_for_test = True
+
 #from data bad method
 full_probability_matrix_badmethod =  [[ 0.86536632,  0.41078120,  0.25688982,  0.15429598,  0.04290900],
                                       [ 0.04755257,  0.19152609,  0.13691758,  0.08676840,  0.01680109],
@@ -259,7 +261,8 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
     def query_dat_indx(self, feat, itm = None):
         resp = data_matrix[itm, feat]
         resp_char = {-1.0:'n', -0.5:'pn', 0.0:'u', 0.5:'py', 1.0:'y'}[resp]
-        print str(self.question_num) + "). " + features[feat] + ' (y/py/u/pn/n/end): ' + resp_char
+        if not print_for_test:
+            print str(self.question_num) + "). " + features[feat] + ' (y/py/u/pn/n/end): ' + resp_char
         return resp
     
     def query_dat_name(self, feat, itm = None):
@@ -300,13 +303,13 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         best_feature = self.features_left[np.argmax(gains)] 
   
         gain = np.max(gains)
-
-        print "Best gain: ", gain
-        print self.helper_str(best_feature)
+        if not print_for_test:
+            print "Best gain: ", gain
+            print self.helper_str(best_feature)
         resp = query_func(best_feature, itm)
         self.knowledge.append((best_feature, resp))    
-
-        self.features_left.remove(best_feature)
+        if not print_for_test:
+            self.features_left.remove(best_feature)
         self.question_num += 1
         self.update_all()
         return best_feature, gains / np.sum(gains)
@@ -315,11 +318,11 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         while True:
             self.iterate()
     
-    def play_game_computer(self, itm = 'dog', depth = 20):
+    def play_game_computer(self, itm = 'desk', depth = 20):
         for i in range(depth):
             self.iterate(self.query_dat_name, itm)
             
-    def computer_iterate(self, itm = 'dog'):
+    def computer_iterate(self, itm = 'desk'):
         return self.iterate(self.query_dat_name, itm)
         
     def get_ordered_feats(self):
@@ -338,10 +341,13 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
     def __str__(self):
         ordered = sorted([(items[self.items_left[i]], prob) for i, prob in zip(range(10000), self.probabilities)], key=lambda x: -x[1])
         to_print_probs = repr([(item, "{:.3}%".format(prob*100)) for item, prob in ordered][:10])
-        return "\nProbabilities: " + to_print_probs + "\n" \
-                "Entropy: " + str(self.entropy) + '\n' +\
-                "Questions asked: " + str(self.question_num)
-
+        if print_for_test:
+            return ""
+            #return "\n\nQuestions asked: " + str(self.question_num)
+        else:
+            return "\nProbabilities: " + to_print_probs + "\n" \
+                    "Entropy: " + str(self.entropy) + '\n' +\
+                    "Questions asked: " + str(self.question_num)
 '''
 player = OptimalPlayer()
 print player.ordered_features_name_and_gain_str()

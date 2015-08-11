@@ -4,7 +4,7 @@ Created on Jul 9, 2015
 @author: alxcoh
 '''
 import numpy as np
-import pickle
+import cPickle as pickle
 from multiprocessing import Pool
 
 data_matrix = data_matrix_np = np.loadtxt("../data/intel_dat.txt")
@@ -28,7 +28,7 @@ def index_to_prob(index):
     return (float(index)/2) - 1
     
 
-with open('../data/all_clusts.pickle') as ac:
+with open('../data/all_clusts_divisive2.pickle') as ac:
     all_clusts = pickle.load(ac)
     
 del all_clusts[-1]
@@ -74,6 +74,6 @@ for c in all_clusts:
 all_clusts_matrix = p.map(new_tup, all_clusts)
 
     
-with open('../data/all_clusts_matrices2.pickle', 'w') as acm2:
+with open('../data/all_clusts_matrices5.pickle', 'w') as acm2:
     pickle.dump(all_clusts_matrix, acm2)
     

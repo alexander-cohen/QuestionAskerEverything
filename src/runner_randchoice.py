@@ -123,10 +123,14 @@ class RandchoicePlayer(ClustPlayer): #ALL ITEMS AND FEATURES WILL BE REFERRED TO
     def __str__(self):
         ordered = sorted([(items[self.items_left[i]], prob) for i, prob in zip(range(10000), self.probabilities)], key=lambda x: -x[1])
         to_print_probs = repr([(item, "{:.3}%".format(prob*100)) for item, prob in ordered][:10])
-        return "\nProbabilities: " + to_print_probs + "\n" + \
-                "Entropy: " + str(self.entropy) + '\n' +\
-                "Prob win: " + str(self.prob_win_if_end(self.probabilities)) + '\n' + \
-                "Questions asked: " + str(self.question_num)
+        if print_for_test:
+            return ""
+            return "\n\nQuestions asked: " + str(self.question_num)
+        else:
+            return "\nProbabilities: " + to_print_probs + "\n" + \
+                    "Entropy: " + str(self.entropy) + '\n' +\
+                    "Prob win: " + str(self.prob_win_if_end(self.probabilities)) + '\n' + \
+                    "Questions asked: " + str(self.question_num)
 
 
 def expected_gain(param):

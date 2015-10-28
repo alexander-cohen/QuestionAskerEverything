@@ -39,8 +39,9 @@ def prob_resp_from_clust(clust, feat, val):
     prior = 1.0/float(len(clust))
     
     for o in clust:
+        print features[feat], items[o], full_probability_matrix_goodmethod[val][int(prob_to_index(data_matrix[o, feat]))]
         sumtot += full_probability_matrix_goodmethod[val][int(prob_to_index(data_matrix[o, feat]))] * prior
-        
+    print sumtot
     return sumtot
 
 
@@ -71,9 +72,15 @@ all_clusts_matrix = []
 for c in all_clusts:
     all_clusts_matrix.append(new_tup(c))
 '''
+'''
 all_clusts_matrix = p.map(new_tup, all_clusts)
 
     
 with open('../data/all_clusts_matrices5.pickle', 'w') as acm2:
     pickle.dump(all_clusts_matrix, acm2)
     
+'''
+clust = all_clusts[0]
+clusts = [np.where(np.array(clust) == val)[0] for val in list(set(clust))]
+print prob_resp_from_clust(clusts[0], features.index("WOULD YOU FIND IT IN A ZOO?"), 1)
+print prob_resp_from_clust(clusts[1], features.index("WOULD YOU FIND IT IN A ZOO?"), 1)

@@ -28,6 +28,13 @@ def ncr(n, r):
 
 print_for_test = True
 
+def prob_to_index(prob):
+    return (prob+1)*2
+
+def index_to_prob(index):
+    return (float(index)/2) - 1
+
+
 #from data bad method
 full_probability_matrix_badmethod =  [[ 0.86536632,  0.41078120,  0.25688982,  0.15429598,  0.04290900],
                                       [ 0.04755257,  0.19152609,  0.13691758,  0.08676840,  0.01680109],
@@ -47,9 +54,8 @@ full_probability_matrix_madeup = [[0.60, 0.25, 0.09, 0.04, 0.02 ],
                                   [0.09, 0.22, 0.38, 0.22, 0.09 ],
                                   [0.05, 0.10, 0.22, 0.38, 0.25 ],
                                   [0.02, 0.04, 0.09, 0.25, 0.60 ]]
-
 all_probs = [np.zeros(np.shape(data_matrix)) for x in range(5)]
-'''
+
 for i in range(5):
     p = (float(i)/2.0) - 1.0
     
@@ -60,7 +66,7 @@ for i in range(5):
 
 all_probs = np.array(all_probs)
 all_probs.dump("../pickled_data/data_probs.pickle")
-'''
+
 with open("../pickled_data/data_probs.pickle", 'r') as d_probs:
     data_probs_temp = pickle.load(d_probs)
 
@@ -70,14 +76,7 @@ num_items_tot = len(items)
 feature_blacklist = []
 
 
-
-def prob_to_index(prob):
-    return (prob+1)*2
-
-def index_to_prob(index):
-    return (float(index)/2) - 1
-
-
+print "beginning full file"
 
 class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
     def __init__(self):
@@ -296,7 +295,8 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         
     def iterate(self, query_func = None, itm = None):
         if query_func == None: query_func = self.query_person_indx
-        print self
+        if not print_for_test:
+            print self
         #best_feature, gain = self.get_best_feature_and_gain()
         gains = self.expected_gains()
               
@@ -306,13 +306,16 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         if not print_for_test:
             print "Best gain: ", gain
             print self.helper_str(best_feature)
+            
         resp = query_func(best_feature, itm)
         self.knowledge.append((best_feature, resp))    
+        
         if not print_for_test:
             self.features_left.remove(best_feature)
+            
         self.question_num += 1
         self.update_all()
-        return best_feature, gains / np.sum(gains)
+        return best_feature, gains
         
     def play_game(self):
         while True:
@@ -331,6 +334,10 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
     def get_normed_gains(self):
         gains = self.expected_gains()
         return gains / np.sum(gains)
+    
+    def get_unnormed_gains(self):
+        gains = self.expected_gains()
+        return gains
         
     def ordered_features_indx(self):
         return np.array([self.features_left[f] for f in np.argsort(self.expected_gains())[::-1]])

@@ -4,26 +4,16 @@ Created on Jul 28, 2015
 @author: alxcoh
 '''
 from runner_numpy import *
+import random
+from multiprocessing import Pool
     
 with open("../data/all_clusts_matrices5.pickle") as acm:
     all_clust_matrix = pickle.load(acm)
 
+print "beginning clustfile"
+
 feature_blacklist = []
 
-import operator as op
-def ncr(n, r):
-    if n == 0 or r == 0 or n == r: return 1
-    r = min(r, n-r)
-    if r == 0: return 1
-    numer = reduce(op.mul, xrange(n, n-r, -1))
-    denom = reduce(op.mul, xrange(1, r+1))
-    return numer//denom
-
-def prob_to_index(prob):
-    return (prob+1)*2
-
-def index_to_prob(index):
-    return (float(index)/2) - 1
 
 cluster_amounts = {2:0, 4:1, 8:2, 16:3, 32:4, 64:5, 128:6, 256:7, 512:8, 999:9}
 
@@ -54,6 +44,10 @@ class ClustPlayer(OptimalPlayer): #ALL itemS AND FEATURES WILL BE REFERRED TO BY
     def prob_knowledge_from_clust(self, indx):
         clust_probs = self.data_probs_clust[:, indx] #a 2D slice of the array, rows being prob and column being feature
         prior = float(len(self.clusts[indx])) / float(len(items))
+        #print '\nprob knowledge from', indx
+        #for f, r in self.knowledge:
+            #print clust_probs[prob_to_index(r)][f]
+        #print '\n'
         return np.prod( np.fromiter((clust_probs[prob_to_index(r)][f] for f, r in self.knowledge), np.float64)) * \
             prior
  
@@ -90,7 +84,7 @@ class ClustPlayer(OptimalPlayer): #ALL itemS AND FEATURES WILL BE REFERRED TO BY
         self.probabilities = self.prob_knowledge_from_items / self.prob_knowledge_overall
     
         self.entropy = entropy(self.probabilities)
-
+        #print 
         #if len(self.items_guessed) > 0: self.prob_knowledge_from_items[np.array(self.items_guessed)] = 0
         
         
@@ -100,6 +94,59 @@ player = OptimalPlayer()
 player.iterate()
 '''
 '''
-player = ClustPlayer(3)
+player = ClustPlayer(9)
 player.play_game()
+'''
+'''
+itms = random.sample(range(len(items)), 50)
+
+def getgamelist(item):
+    print item, items[item]
+    player = ClustPlayer(9)
+    this_game = [item, items[item]]
+    questions = []
+    for x in range(20):
+        choice, infogains = player.computer_iterate(items[item])
+        
+        this_question = [choice, infogains, np.argsort(infogains), [player.features_left[f] for f in np.argsort(infogains)[::-1]]]
+        #print len(this_question[3])
+        questions.append(this_question)
+        player.features_left.remove(choice)
+        
+    this_game.append(questions)
+    return this_game
+        
+        
+p = Pool()
+all_games = p.map(getgamelist, itms)
+        
+with open("../data/all_games_for_experiment.pickle", 'w') as agfe:
+    pickle.dump(all_games, agfe)
+        
+
+
+'''
+#print_for_test = False
+#player = ClustPlayer(0)
+'''
+expected = player.get_unnormed_gains()
+print expected[features.index("WOULD YOU FIND IT IN A ZOO?")]
+'''
+'''
+player.knowledge = [(features.index("WOULD YOU FIND IT IN A ZOO?"), 1.0)]
+print "knowledge set 1"
+print player.prob_knowledge_from_clust(0)
+print player.prob_knowledge_from_clust(1)
+
+player.knowledge = [(features.index("WOULD YOU FIND IT IN A ZOO?"), -1.0)]
+print "knowledge set -1"
+print player.prob_knowledge_from_clust(0)
+print player.prob_knowledge_from_clust(1)
+player.knowledge = []
+'''
+'''
+print player.prob_response("WOULD YOU FIND IT IN A ZOO?", 1.0)
+print player.prob_response("WOULD YOU FIND IT IN A ZOO?", -1.0)
+
+#print expected[features.index("DOES IT MAKE A SOUND?")]
 '''

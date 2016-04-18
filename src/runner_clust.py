@@ -11,14 +11,16 @@ import time
 with open("../data/all_clusts_matrices5.pickle") as acm:
     all_clust_matrix = pickle.load(acm)
 
+    
 print "beginning clustfile"
+
+
 
 feature_blacklist = []
 
-
 cluster_amounts = {2:0, 4:1, 8:2, 16:3, 32:4, 64:5, 128:6, 256:7, 512:8, 999:9}
 
-class ClustPlayer(OptimalPlayer): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDEX
+class ClustPlayer(OptimalPlayer): #ALL ITEMS AND FEATURES WILL BE REFERRED TO BY INDEX
     def __init__(self, clusts):
         self.clusts = None
         self.load_new_prob_matrix(clusts)
@@ -47,7 +49,6 @@ class ClustPlayer(OptimalPlayer): #ALL itemS AND FEATURES WILL BE REFERRED TO BY
         #print self.clusts_index
         #print self.clusts_index
         
-        
         #t = time.time()
         #should be 5x|c|x218
         t = time.time()
@@ -63,7 +64,7 @@ class ClustPlayer(OptimalPlayer): #ALL itemS AND FEATURES WILL BE REFERRED TO BY
         self.data_probs = np.zeros((5, len(items), len(features)))
         print "part 3:", time.time() - t
         '''
-        
+
         t = time.time()
         self.data_probs = np.array([self.data_probs_clust[:,c] for c in self.clusts_index])
         self.data_probs = np.swapaxes(self.data_probs, 0, 1)
@@ -225,7 +226,6 @@ print player.prob_response("WOULD YOU FIND IT IN A ZOO?", -1.0)
 
 #print expected[features.index("DOES IT MAKE A SOUND?")]
 '''
-'''
+
 player = ClustPlayer(9)
 player.play_game()
-'''

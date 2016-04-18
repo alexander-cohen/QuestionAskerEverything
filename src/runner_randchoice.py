@@ -12,7 +12,9 @@ from runner_clust import ClustPlayer
 
 
 class RandchoicePlayer(ClustPlayer): #ALL ITEMS AND FEATURES WILL BE REFERRED TO BY INDEX
-    def __init__(self, clusts):
+    
+    
+    def __init__(self, clusts, numitems):
         super(RandchoicePlayer, self).__init__(clusts)
         self.cur_money = 2.0
         self.num_item_rand = 20

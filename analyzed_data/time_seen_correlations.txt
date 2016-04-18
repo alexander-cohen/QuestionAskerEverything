@@ -1,0 +1,326 @@
+Person 0:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.1916629695 0.304255531702
+Trial 2 (pearson/spearman): 0.353093931802 0.540898723026
+Trial 3 (pearson/spearman): -0.0975900072949 -0.0975900072949
+Trial 4 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 5 (pearson/spearman): 0.1916629695 0.304255531702
+Trial 6 (pearson/spearman): 0.414039335605 0.333947207395
+Trial 7 (pearson/spearman): 1.72378501309e-17 0.0
+Trial 8 (pearson/spearman): -0.263831202029 -0.0882734829505
+Trial 9 (pearson/spearman): -0.465780495065 -0.441367414752
+Average pearson for person 9: -0.00695347004062
+Average spearman for person 9: 0.0463333886404
+
+Person 1:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.0 0.0
+Trial 2 (pearson/spearman): -0.130930734142 -0.246885359939
+Trial 3 (pearson/spearman): 0.621059003408 0.621059003408
+Trial 4 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 5 (pearson/spearman): -0.163098084666 -0.154303349962
+Trial 6 (pearson/spearman): 0.834106011602 0.819688599971
+Trial 7 (pearson/spearman): 0.497050121748 0.524631389871
+Trial 8 (pearson/spearman): -0.544388228581 -0.802377419803
+Trial 9 (pearson/spearman): -0.813637559991 -0.794461346554
+Average pearson for person 9: 0.043109126352
+Average spearman for person 9: 0.00982822511328
+
+Person 2:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.0402150553133 -0.0676123403783
+Trial 2 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 3 (pearson/spearman): 0 0
+Trial 4 (pearson/spearman): 0.264820448851 0.371867872081
+Trial 5 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 6 (pearson/spearman): 0.267261241912 -0.0676123403783
+Trial 7 (pearson/spearman): -0.176546965901 0.0676123403783
+Trial 8 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 9 (pearson/spearman): -0.644424077783 -0.516100229611
+Average pearson for person 9: -0.0460035142375
+Average spearman for person 9: -0.034277543205
+
+Person 3:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.0975900072949 0.0975900072949
+Trial 2 (pearson/spearman): 0.392792202425 0.392792202425
+Trial 3 (pearson/spearman): -0.654653670708 -0.654653670708
+Trial 4 (pearson/spearman): 0.621059003408 0.621059003408
+Trial 5 (pearson/spearman): 0.292770021885 0.292770021885
+Trial 6 (pearson/spearman): 0.617914380653 0.77754191435
+Trial 7 (pearson/spearman): -0.487950036474 -0.487950036474
+Trial 8 (pearson/spearman): 0.654653670708 0.654653670708
+Trial 9 (pearson/spearman): 0.710321043301 0.833238089795
+Average pearson for person 9: 0.224449662249
+Average spearman for person 9: 0.252704120268
+
+Person 4:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.130930734142 -0.130930734142
+Trial 2 (pearson/spearman): 0.828078671211 0.828078671211
+Trial 3 (pearson/spearman): -0.621059003408 -0.621059003408
+Trial 4 (pearson/spearman): 0.8305395345 0.845154254729
+Trial 5 (pearson/spearman): 0.163098084666 0.154303349962
+Trial 6 (pearson/spearman): 0.0333642404641 -0.135224680757
+Trial 7 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 8 (pearson/spearman): 0.0574169251763 -0.0925820099773
+Trial 9 (pearson/spearman): -0.0692205302646 -0.0882734829505
+Average pearson for person 9: 0.0698494985778
+Average spearman for person 9: 0.0366674162243
+
+Person 5:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.27183014111 -0.277746029932
+Trial 2 (pearson/spearman): 0.690065559342 0.617213399848
+Trial 3 (pearson/spearman): 0.4472135955 0.338061701891
+Trial 4 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 5 (pearson/spearman): -0.261861468283 -0.154303349962
+Trial 6 (pearson/spearman): -0.676123403783 -0.698253251827
+Trial 7 (pearson/spearman): -0.487950036474 -0.487950036474
+Trial 8 (pearson/spearman): -0.526986039392 0.0
+Trial 9 (pearson/spearman): -0.225117279132 -0.500216403386
+Average pearson for person 9: -0.170538141576
+Average spearman for person 9: -0.155598617227
+
+Person 6:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.654653670708 0.678934739833
+Trial 2 (pearson/spearman): 0.27183014111 0.246885359939
+Trial 3 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 4 (pearson/spearman): 0.724568837309 0.698253251827
+Trial 5 (pearson/spearman): 0.130930734142 0.0
+Trial 6 (pearson/spearman): 0.845154254729 0.880406274042
+Trial 7 (pearson/spearman): -0.497050121748 -0.493770719879
+Trial 8 (pearson/spearman): -0.474935690146 -0.500216403386
+Trial 9 (pearson/spearman): 0.621059003408 0.637535577755
+Average pearson for person 9: 0.240714156365
+Average spearman for person 9: 0.227895881427
+
+Person 7:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.878310065654 0.878310065654
+Trial 2 (pearson/spearman): -0.782460796436 -0.882734829505
+Trial 3 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 4 (pearson/spearman): 0.523722936566 0.462910049886
+Trial 5 (pearson/spearman): 0.414039335605 0.414039335605
+Trial 6 (pearson/spearman): -0.65923172418 -0.576817903683
+Trial 7 (pearson/spearman): -0.130930734142 -0.12344267997
+Trial 8 (pearson/spearman): -0.054366028222 0.273229533324
+Trial 9 (pearson/spearman): 0.154041596847 -0.11595420713
+Average pearson for person 9: 0.0474055385835
+Average spearman for person 9: 0.0460470098323
+
+Person 8:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.392792202425 -0.432049379894
+Trial 2 (pearson/spearman): 0.392792202425 0.392792202425
+Trial 3 (pearson/spearman): 0.654653670708 0.654653670708
+Trial 4 (pearson/spearman): -0.207019667803 -0.207019667803
+Trial 5 (pearson/spearman): 0.392792202425 0.392792202425
+Trial 6 (pearson/spearman): -0.387699057268 -0.264820448851
+Trial 7 (pearson/spearman): -0.0975900072949 -0.0975900072949
+Trial 8 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 9 (pearson/spearman): -0.0517549169507 0.0303588370359
+Average pearson for person 9: -0.00894099786079
+Average spearman for person 9: 0.00763252063259
+
+Person 9:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 2 (pearson/spearman): -0.130930734142 -0.130930734142
+Trial 3 (pearson/spearman): -0.0975900072949 -0.0975900072949
+Trial 4 (pearson/spearman): 0.598026310442 0.555492059864
+Trial 5 (pearson/spearman): -0.597614304667 -0.597614304667
+Trial 6 (pearson/spearman): 0.0638876565 -0.0676123403783
+Trial 7 (pearson/spearman): -0.207019667803 -0.207019667803
+Trial 8 (pearson/spearman): 0.798703120749 0.782690898131
+Trial 9 (pearson/spearman): 0.480079358519 0.493770719879
+Average pearson for person 9: 0.103847246645
+Average spearman for person 9: 0.086211735773
+
+Person 10:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.207019667803 0.207019667803
+Trial 2 (pearson/spearman): -0.472077475482 -0.154303349962
+Trial 3 (pearson/spearman): 0.815490423329 0.802377419803
+Trial 4 (pearson/spearman): -0.478091443734 -0.478091443734
+Trial 5 (pearson/spearman): -0.625968637149 -0.507092552837
+Trial 6 (pearson/spearman): 0.233549683248 -0.0676123403783
+Trial 7 (pearson/spearman): 0.8305395345 0.845154254729
+Trial 8 (pearson/spearman): -0.384775191575 -0.765036852237
+Trial 9 (pearson/spearman): 0.887432225006 0.925820099773
+Average pearson for person 9: 0.101311878595
+Average spearman for person 9: 0.0808234902958
+
+Person 11:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 2 (pearson/spearman): 0.834106011602 0.819688599971
+Trial 3 (pearson/spearman): 0.292770021885 0.292770021885
+Trial 4 (pearson/spearman): -0.411506961173 -0.154303349962
+Trial 5 (pearson/spearman): -0.654653670708 -0.654653670708
+Trial 6 (pearson/spearman): 0.267261241912 -0.0676123403783
+Trial 7 (pearson/spearman): 0.355035801248 0.308606699924
+Trial 8 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 9 (pearson/spearman): 0.0275414869224 0.11595420713
+Average pearson for person 9: 0.0972415399971
+Average spearman for person 9: 0.0922311636145
+
+Person 12:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.414039335605 0.414039335605
+Trial 2 (pearson/spearman): 0.956182887468 0.956182887468
+Trial 3 (pearson/spearman): 0.845154254729 0.845154254729
+Trial 4 (pearson/spearman): 0.380562197554 0.401188709901
+Trial 5 (pearson/spearman): 0.828078671211 0.828078671211
+Trial 6 (pearson/spearman): 0.698253251827 0.676123403783
+Trial 7 (pearson/spearman): 0.414039335605 0.414039335605
+Trial 8 (pearson/spearman): -0.402150553133 -0.339467369917
+Trial 9 (pearson/spearman): 0.866400225444 0.840668001696
+Average pearson for person 9: 0.500055960631
+Average spearman for person 9: 0.503600723008
+
+Person 13:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0 0
+Trial 2 (pearson/spearman): 0 0
+Trial 3 (pearson/spearman): 0.130930734142 0.130930734142
+Trial 4 (pearson/spearman): -0.1916629695 -0.101418510567
+Trial 5 (pearson/spearman): 0.392792202425 0.392792202425
+Trial 6 (pearson/spearman): 0.3194382825 0.270449361513
+Trial 7 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 8 (pearson/spearman): -0.353093931802 -0.540898723026
+Trial 9 (pearson/spearman): 0.602281377051 0.507092552837
+Average pearson for person 9: 0.0507893492391
+Average spearman for person 9: 0.0266155414898
+
+Person 14:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.130930734142 -0.12344267997
+Trial 2 (pearson/spearman): -0.292770021885 -0.292770021885
+Trial 3 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 4 (pearson/spearman): -0.3194382825 -0.169030850946
+Trial 5 (pearson/spearman): -0.414039335605 -0.414039335605
+Trial 6 (pearson/spearman): 0.458189794953 0.353093931802
+Trial 7 (pearson/spearman): 0.392792202425 0.308606699924
+Trial 8 (pearson/spearman): -0.7612020569 -0.925820099773
+Trial 9 (pearson/spearman): 0.781078762746 0.765036852237
+Average pearson for person 9: -0.0679111873332
+Average spearman for person 9: -0.0891157706639
+
+Person 15:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.1916629695 -0.304255531702
+Trial 2 (pearson/spearman): 0.0 0.0
+Trial 3 (pearson/spearman): 0 0
+Trial 4 (pearson/spearman): 0.3194382825 0.270449361513
+Trial 5 (pearson/spearman): -0.261861468283 -0.154303349962
+Trial 6 (pearson/spearman): 0.734543455169 0.698253251827
+Trial 7 (pearson/spearman): -0.815490423329 -0.833238089795
+Trial 8 (pearson/spearman): -0.502952952545 0.0
+Trial 9 (pearson/spearman): 0.742307488958 0.617914380653
+Average pearson for person 9: 0.0024321412969
+Average spearman for person 9: 0.0294820022534
+
+Person 16:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.0 0.0
+Trial 2 (pearson/spearman): 0.3194382825 0.371867872081
+Trial 3 (pearson/spearman): 0.4472135955 0.540898723026
+Trial 4 (pearson/spearman): -0.353093931802 -0.270449361513
+Trial 5 (pearson/spearman): -0.0975900072949 -0.0975900072949
+Trial 6 (pearson/spearman): 0.0610467695667 0.212511859252
+Trial 7 (pearson/spearman): -0.878310065654 -0.925820099773
+Trial 8 (pearson/spearman): -0.24484781839 -0.540898723026
+Trial 9 (pearson/spearman): 0.341881729379 0.304255531702
+Average pearson for person 9: -0.0404261446194
+Average spearman for person 9: -0.0405224205546
+
+Person 17:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.828078671211 -0.828078671211
+Trial 2 (pearson/spearman): 0.414039335605 0.414039335605
+Trial 3 (pearson/spearman): -0.103509833901 -0.212511859252
+Trial 4 (pearson/spearman): -0.281505387193 -0.270449361513
+Trial 5 (pearson/spearman): -0.0882734829505 -0.0338061701891
+Trial 6 (pearson/spearman): -0.497050121748 -0.64733887497
+Trial 7 (pearson/spearman): 0 0
+Trial 8 (pearson/spearman): -0.48258066376 -0.648074069841
+Trial 9 (pearson/spearman): 0.495239001921 0.441367414752
+Average pearson for person 9: -0.137171982324
+Average spearman for person 9: -0.178485225662
+
+Person 18:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.621059003408 -0.621059003408
+Trial 2 (pearson/spearman): -0.392792202425 -0.432049379894
+Trial 3 (pearson/spearman): 0.654653670708 0.654653670708
+Trial 4 (pearson/spearman): 0.497050121748 0.524631389871
+Trial 5 (pearson/spearman): 0 0
+Trial 6 (pearson/spearman): 0.0 0.0
+Trial 7 (pearson/spearman): 0.119522860933 0.119522860933
+Trial 8 (pearson/spearman): -0.736788397613 -0.698253251827
+Trial 9 (pearson/spearman): 0.854884242263 0.880406274042
+Average pearson for person 9: 0.0375471292206
+Average spearman for person 9: 0.0427852560426
+
+Person 19:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.292770021885 -0.292770021885
+Trial 2 (pearson/spearman): -0.0845154254729 0.0303588370359
+Trial 3 (pearson/spearman): 0.621059003408 0.621059003408
+Trial 4 (pearson/spearman): 0.414039335605 0.414039335605
+Trial 5 (pearson/spearman): -0.392792202425 -0.392792202425
+Trial 6 (pearson/spearman): -0.392792202425 -0.308606699924
+Trial 7 (pearson/spearman): -0.163098084666 -0.185164019955
+Trial 8 (pearson/spearman): -0.706758366885 -0.698253251827
+Trial 9 (pearson/spearman): 0.361403161162 0.597614304667
+Average pearson for person 9: -0.0636224803583
+Average spearman for person 9: -0.0214514715298
+
+Person 20:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.0 -0.0308606699924
+Trial 2 (pearson/spearman): -0.782460796436 -0.845154254729
+Trial 3 (pearson/spearman): 0.292770021885 0.292770021885
+Trial 4 (pearson/spearman): 0.683130051064 0.683130051064
+Trial 5 (pearson/spearman): -0.597614304667 -0.597614304667
+Trial 6 (pearson/spearman): -0.781078762746 -0.77151674981
+Trial 7 (pearson/spearman): -0.7027642215 -0.676123403783
+Trial 8 (pearson/spearman): -0.690065559342 -0.617213399848
+Trial 9 (pearson/spearman): -0.523288251525 -0.608759587435
+Average pearson for person 9: -0.310137182327
+Average spearman for person 9: -0.317134229732
+
+Person 21:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): 0.292770021885 0.292770021885
+Trial 2 (pearson/spearman): 0.654653670708 0.654653670708
+Trial 3 (pearson/spearman): -0.4472135955 -0.439480212459
+Trial 4 (pearson/spearman): 0.891901744479 0.941123948114
+Trial 5 (pearson/spearman): -0.261861468283 -0.154303349962
+Trial 6 (pearson/spearman): 0.458682472294 0.441367414752
+Trial 7 (pearson/spearman): -0.639064442247 -0.678934739833
+Trial 8 (pearson/spearman): -0.422918959036 -0.439480212459
+Trial 9 (pearson/spearman): 0.457229956859 0.405839724957
+Average pearson for person 9: 0.0984179401158
+Average spearman for person 9: 0.10235562657
+
+Person 22:
+Trial 0 (pearson/spearman): 0 0
+Trial 1 (pearson/spearman): -0.828078671211 -0.828078671211
+Trial 2 (pearson/spearman): 0.767377530674 0.845154254729
+Trial 3 (pearson/spearman): 0.5749889085 0.507092552837
+Trial 4 (pearson/spearman): 0.0975900072949 0.0975900072949
+Trial 5 (pearson/spearman): 0.8305395345 0.845154254729
+Trial 6 (pearson/spearman): 0.0782460796436 0.119522860933
+Trial 7 (pearson/spearman): -0.130930734142 0.0
+Trial 8 (pearson/spearman): 0.609846565072 0.338061701891
+Trial 9 (pearson/spearman): -0.310529501704 -0.212511859252
+Average pearson for person 9: 0.168904971863
+Average spearman for person 9: 0.171198510195
+
+
+
+Average pearson overall: 0.040624827785
+Average spearman overall: 0.040253362296

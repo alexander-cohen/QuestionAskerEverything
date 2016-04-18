@@ -3,13 +3,13 @@ Created on Jul 4, 2015
 
 @author: alxcoh
 '''
+
 import numpy as np
 from scipy.stats import entropy
 import cPickle as pickle
 import math
 
 data_matrix = np.loadtxt("../data/intel_dat.txt")
-
 
 with open("../data/intel_feat.txt", "r") as feats:
     features = [l[:-2] for l in feats]
@@ -96,7 +96,7 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         self.prob_knowledge_from_items = np.tile(1.0, self.num_items_left) #empty knowledge set, so 1.0 prob
         
         self.knowledge = [] #will add feature/response pairs
-        
+        self.knowledge_indexfrom = np.array([])
         self.data_probs = data_probs_temp
         
         self.entropy = entropy(self.probabilities) #entropy of distribution
@@ -108,10 +108,17 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         self.update_all() #updates all information
         
     def prob_knowledge_from_item(self, item):
+        '''if len(self.knowledge_indexfrom) != len(self.knowledge):
+            self.knowledge_indexfrom = np.array( [[prob_to_index(prob), f] for f, prob in self.knowledge ], dtype=np.int16)
+        '''
         item_probs = self.data_probs[:, item] #a 2D slice of the array, rows being prob and column being feature
+        
+        #CHANGE MADE HERE!!!!! 
         return np.prod( np.fromiter((item_probs[prob_to_index(r)][f] for f, r in self.knowledge), np.float64)) * \
                 self.prior_prob
-        
+        '''return 1 if len(self.knowledge_indexfrom) == 0 else np.prod( item_probs[list(self.knowledge_indexfrom.T)] ) * \
+            self.prior_prob
+        '''
     def get_prob_knowledge_from_items(self):
         return np.fromiter( ((self.prob_knowledge_from_item(item)) for item in self.items_left ), np.float64)
 
@@ -149,15 +156,25 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         return self.entropy if math.isinf(ent) else ent
         
     def prob_response(self, feature, val):
+        for k in self.knowledge:
+            if k[0] == feature:
+                if val == k[1]: return 1.0
+                else: return 0.0
+            
+        
         prob_of_val = self.data_probs[prob_to_index(val), self.items_left, feature]
         return np.sum(self.probabilities * prob_of_val)
         
     def expected_gain(self, feature):
+        
+        for k in self.knowledge:
+            if k[0] == feature: return 0
+            
         eig = 0
         for i in range(5):
             eig += self.prob_response(feature, index_to_prob(i)) * self.info_gain_ent(self.entropy_with_new_knowledge((feature, index_to_prob(i))))
         return  eig
-                                                            
+                            
     def expected_gains(self):
         return_arr = []
         for f in self.features_left:
@@ -235,14 +252,15 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         
         expected_gains = list(np.array(prob_responses)*np.array(info_gains))
         
-        
+        '''
         helper_str = "eig = " + str(self.expected_gain(best_feature)) + ':\n'\
                         '   y = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[0], info_gains[0], expected_gains[0]) + '\n' \
                         '  py = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[1], info_gains[1], expected_gains[1]) + '\n' \
                         '   u = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[2], info_gains[2], expected_gains[2]) + '\n' \
                         '  pn = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[3], info_gains[3], expected_gains[3]) + '\n' \
                         '   n = {:.4f} * {:.4f} = {:.4f}'.format(prob_responses[4], info_gains[4], expected_gains[4]) + '\n'   
-        
+        '''
+        helper_str = ''
         return helper_str
         
     def query_person_indx(self, feat, itm = None):
@@ -265,8 +283,10 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         return resp
     
     def query_dat_name(self, feat, itm = None):
-        return self.query_dat_indx(feat, items.index(itm))
-        
+        answer = self.query_dat_indx(feat, items.index(itm))
+        print features[feat], ' ', answer
+        return answer
+    
     def guess_threshes(self):
         ''' 
         #percentage threshold
@@ -295,17 +315,17 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         
     def iterate(self, query_func = None, itm = None):
         if query_func == None: query_func = self.query_person_indx
-        if not print_for_test:
-            print self
+        
+        print self
         #best_feature, gain = self.get_best_feature_and_gain()
         gains = self.expected_gains()
               
         best_feature = self.features_left[np.argmax(gains)] 
   
         gain = np.max(gains)
-        if not print_for_test:
-            print "Best gain: ", gain
-            print self.helper_str(best_feature)
+        print self.helper_str(best_feature)
+            #print "Best gain: ", gain
+            #print self.helper_str(best_feature)
             
         resp = query_func(best_feature, itm)
         self.knowledge.append((best_feature, resp))    
@@ -324,6 +344,7 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
     def play_game_computer(self, itm = 'desk', depth = 20):
         for i in range(depth):
             self.iterate(self.query_dat_name, itm)
+            print "Prob item:", self.probabilities[items.index(itm)]
             
     def computer_iterate(self, itm = 'desk'):
         return self.iterate(self.query_dat_name, itm)
@@ -348,13 +369,19 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
     def __str__(self):
         ordered = sorted([(items[self.items_left[i]], prob) for i, prob in zip(range(10000), self.probabilities)], key=lambda x: -x[1])
         to_print_probs = repr([(item, "{:.3}%".format(prob*100)) for item, prob in ordered][:10])
-        if print_for_test:
-            return ""
+        #to_print_probs = "err"
+        #if print_for_test:
+        #    return ""
             #return "\n\nQuestions asked: " + str(self.question_num)
-        else:
+        #else:
+        #return ""
+        if True:
             return "\nProbabilities: " + to_print_probs + "\n" \
                     "Entropy: " + str(self.entropy) + '\n' +\
                     "Questions asked: " + str(self.question_num)
+
+
+
 '''
 player = OptimalPlayer()
 print player.ordered_features_name_and_gain_str()

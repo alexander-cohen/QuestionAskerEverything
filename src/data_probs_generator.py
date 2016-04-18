@@ -39,9 +39,9 @@ def prob_resp_from_clust(clust, feat, val):
     prior = 1.0/float(len(clust))
     
     for o in clust:
-        print features[feat], items[o], full_probability_matrix_goodmethod[val][int(prob_to_index(data_matrix[o, feat]))]
+        #print features[feat], items[o], full_probability_matrix_goodmethod[val][int(prob_to_index(data_matrix[o, feat]))]
         sumtot += full_probability_matrix_goodmethod[val][int(prob_to_index(data_matrix[o, feat]))] * prior
-    print sumtot
+    #print sumtot
     return sumtot
 
 
@@ -59,11 +59,19 @@ def dat_probs(clust):
         prob_matrix.append(new_matrix)
         
     return prob_matrix
+
+def prob_resps_oneclust(cluster):
+    prob_matrix = np.zeros((5, len(features)))
+    for val in range(5):
+        for f in range(len(features)):
+            prob_matrix[val, f] = prob_resp_from_clust(cluster, f, val)
+        
+    return prob_matrix
         
 def new_tup(clust):
-    print "STARTING:", len(set(clust))
+    #print "STARTING:", len(set(clust))
     dat_matrx = dat_probs(clust)
-    print "FINISHED:", len(set(clust))
+    #print "FINISHED:", len(set(clust))
     return (clust, dat_matrx)
 
 p = Pool()
@@ -82,5 +90,5 @@ with open('../data/all_clusts_matrices5.pickle', 'w') as acm2:
 '''
 clust = all_clusts[0]
 clusts = [np.where(np.array(clust) == val)[0] for val in list(set(clust))]
-print prob_resp_from_clust(clusts[0], features.index("WOULD YOU FIND IT IN A ZOO?"), 1)
-print prob_resp_from_clust(clusts[1], features.index("WOULD YOU FIND IT IN A ZOO?"), 1)
+#print prob_resp_from_clust(clusts[0], features.index("WOULD YOU FIND IT IN A ZOO?"), 1)
+#print prob_resp_from_clust(clusts[1], features.index("WOULD YOU FIND IT IN A ZOO?"), 1)

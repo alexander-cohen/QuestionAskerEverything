@@ -24,7 +24,7 @@ import json
 import pandas as pd
 #from matplotlib import pyplot as plt
 import cPickle as pickle
-from runner_nonbayesian import NonBayesianPlayer
+#from runner_nonbayesian import NonBayesianPlayer
 
 #from matplotlib import pyplot as plt
 import scipy.stats as scistats
@@ -33,7 +33,7 @@ import data_loader
 
 data_matrix, data_dict, features, objects = data_loader.get_data()
 
-fulldatafile = open("datalogs/fulldata.txt", 'w')
+fulldatafile = open("datalogs/fulldata_correctorder.txt", 'w')
 
 
 '''
@@ -749,7 +749,7 @@ else:
             personstr += "1111\n" + fullgamestr
 
         personstr += "2222\n"
-        trials = [oneshots[order.index(i)] for i in range(10)]
+        trials = [oneshots[i] for i in range(10)]
         oneshotstr = ""
         oneshotstr += "OneshotOrders:" + str(order) + "\n"
 

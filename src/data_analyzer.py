@@ -14,6 +14,15 @@ with open("datalogs/oneshotdata.pickle", 'r') as oneshotdata:
 with open("datalogs/peopledata.pickle", 'r') as peopledata:
 	people = pickle.load(peopledata)
 
+with open("datalogs/fullgamedata_correctorder.pickle", 'r') as fullgamedata:
+	fullgames_correctorder = pickle.load(fullgamedata)
+
+with open("datalogs/oneshotdata_correctorder.pickle", 'r') as oneshotdata:
+	oneshots_correctorder = pickle.load(oneshotdata)
+
+with open("datalogs/peopledata_correctorder.pickle", 'r') as peopledata:
+	people_correctorder = pickle.load(peopledata)
+
 should_strict_only_consider = False
 
 
@@ -63,7 +72,7 @@ def correlationOfChoicesWithSeenBefore(persondata):
 
 def analyze_times_seen():
 	allcors = []
-	for p in people:
+	for p in people_correctorder:
 		allcors.append(correlationOfChoicesWithSeenBefore(p))
 
 	overalltotpear = 0
@@ -278,3 +287,4 @@ def full_data_analyses():
 
 #random_subsets_over_n(log = True, numItersPer = 1, numPeoplePer = 1)
 
+analyze_times_seen()

@@ -14,7 +14,7 @@ def get_data():
     data_matrix_np = np.loadtxt("../data/intel_dat.txt")
     features = [l[:-2] for l in open("../data/intel_feat.txt", "r")]
     objects = [l[:-2] for l in open("../data/intel_items.txt", "r")]
-    
+
     data_dict = {}
 
     for i in range(len(data_matrix_np)):

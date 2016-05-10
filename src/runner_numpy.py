@@ -8,8 +8,11 @@ import numpy as np
 from scipy.stats import entropy
 import cPickle as pickle
 import math
+import time
 
 data_matrix = np.loadtxt("../data/intel_dat.txt")
+
+
 
 with open("../data/intel_feat.txt", "r") as feats:
     features = [l[:-2] for l in feats]
@@ -54,6 +57,7 @@ full_probability_matrix_madeup = [[0.60, 0.25, 0.09, 0.04, 0.02 ],
                                   [0.09, 0.22, 0.38, 0.22, 0.09 ],
                                   [0.05, 0.10, 0.22, 0.38, 0.25 ],
                                   [0.02, 0.04, 0.09, 0.25, 0.60 ]]
+
 all_probs = [np.zeros(np.shape(data_matrix)) for x in range(5)]
 
 for i in range(5):
@@ -69,7 +73,6 @@ all_probs.dump("../pickled_data/data_probs.pickle")
 
 with open("../pickled_data/data_probs.pickle", 'r') as d_probs:
     data_probs_temp = pickle.load(d_probs)
-
 
 num_items_tot = len(items)
 
@@ -314,6 +317,7 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         '''
         
     def iterate(self, query_func = None, itm = None):
+        t = time.time()
         if query_func == None: query_func = self.query_person_indx
         
         print self
@@ -326,8 +330,10 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         print self.helper_str(best_feature)
             #print "Best gain: ", gain
             #print self.helper_str(best_feature)
-            
+        t1 = time.time() - t
+
         resp = query_func(best_feature, itm)
+        t = time.time()
         self.knowledge.append((best_feature, resp))    
         
         if not print_for_test:
@@ -335,6 +341,8 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
             
         self.question_num += 1
         self.update_all()
+        t2 = time.time() - t
+        print "time to iterate:", t1+t2
         return best_feature, gains
         
     def play_game(self):

@@ -11,7 +11,8 @@ import time
 with open("../data/all_clusts_matrices5.pickle") as acm:
     all_clust_matrix = pickle.load(acm)
 
-    
+#print all_clust_matrix[4][0]
+
 print "beginning clustfile"
 
 
@@ -135,14 +136,12 @@ class ClustPlayer(OptimalPlayer): #ALL ITEMS AND FEATURES WILL BE REFERRED TO BY
             multr[c] = prob_response_for_clust[i]
         
         new_prob_knowledge_from_items = self.prob_knowledge_from_items * multr
-                                                
         new_prob_knowledge_overall = np.sum(new_prob_knowledge_from_items)
         
         return new_prob_knowledge_from_items/new_prob_knowledge_overall
  
-    
- 
     def update_all(self):
+        t = time.time()
         self.num_items_left = float(len(self.clusts))
         self.prior_prob = 1.0 / self.num_items_left
         
@@ -152,6 +151,7 @@ class ClustPlayer(OptimalPlayer): #ALL ITEMS AND FEATURES WILL BE REFERRED TO BY
         self.probabilities = self.prob_knowledge_from_items / self.prob_knowledge_overall
     
         self.entropy = entropy(self.probabilities)
+        #print "time to update:", time.time() - t
         #print 
         #if len(self.items_guessed) > 0: self.prob_knowledge_from_items[np.array(self.items_guessed)] = 0
 def which_cluster(clusters, item):

@@ -5,7 +5,7 @@ Created on Sep 5, 2015
 '''
 analyze_randomchoice = False
 analyzes = False
-analyze_fullgame = False
+analyze_fullgame = True
 analyze_fullgame_probs = False
 import random
 from runner_randchoice import RandchoicePlayer
@@ -183,7 +183,9 @@ class Fullgame:
         #Optimal Temperature:
         #[ 0.60785209  0.54815729  0.56051099  0.52031569  0.39981981  0.23249061 -0.08519039 -0.63554068 -1.41480307 -0.68202096]
         self.optimal_temp = [0.60785209,  0.54815729,  0.56051099,  0.52031569,  0.39981981,  0.23249061, -0.08519039, -0.63554068, -1.41480307, -0.68202096]
-        self.models = [ClustPlayer(i) for i in range(1, 10)] + [NonBayesianPlayer()]
+        self.models = [ClustPlayer(9), ClustPlayer(9), \
+                       RandchoicePlayer(9, 20), RandomN(9, rands=randobjects), \
+                       ClustPlayer(9)]
 
         self.sumprobs = [0 for i in self.models]
         self.sumtotal = [0 for i in self.models]
@@ -272,7 +274,7 @@ class Fullgame:
         #first is optimal, second is context insensitive
         self.models = [ClustPlayer(9), ClustPlayer(9), \
                        RandchoicePlayer(9, 20), RandomN(9, rands=randobjects), \
-                       NonBayesianPlayer()]
+                       ClustPlayer(9)]
 
         self.gradient = [0 for m in self.models]
         self.sumtotal = [[0 for m in self.models] for d in range(10)]
@@ -499,9 +501,6 @@ class Person:
         '''
         #print "All games:", self.fullgames[1:]
         return [Fullgame(full) for full in self.fullgames[1:]]
-        
-
-       
             
     def analyze_oneshots(self):
         return Oneshot(self.oneshots, self.order, self.rands)

@@ -1,5 +1,6 @@
 import cPickle as pickle
 from runner_randomN import *
+from runner_randchoice import RandchoicePlayer
 import scipy.stats as scistats
 from multiprocessing import Pool
 import os
@@ -23,8 +24,19 @@ with open("datalogs/oneshotdata_correctorder.pickle", 'r') as oneshotdata:
 with open("datalogs/peopledata_correctorder.pickle", 'r') as peopledata:
 	people_correctorder = pickle.load(peopledata)
 
-should_strict_only_consider = False
+should_strict_only_consider = True
 
+def makedir(pathname):
+	if not os.path.exists(os.path.dirname(pathname)):
+	    try:
+	        os.makedirs(os.path.dirname(pathname))
+	    except OSError as exc: # Guard against race condition
+	        if exc.errno != errno.EEXIST:
+	            raise
+
+def normalize(a):
+	row_sums = a.sum(axis=1)
+	return a / row_sums[:, np.newaxis]
 
 def getNumSeenBeforePerTrial(persondata):
 	their_oneshots = persondata["oneshots"]
@@ -194,12 +206,7 @@ def analyze_randomsubsets(numIters, numSimPeople, numObjects, log = True, printo
 		filepath = "strict_only_consider" if should_strict_only_consider else "loose_only_consider"
 		filepath += "-" + time.strftime("%m:%d:%Y-%H:%M:%S")
 		fullpath = "../analyzed_data/" + filepath + "/"
-		if not os.path.exists(os.path.dirname(fullpath)):
-		    try:
-		        os.makedirs(os.path.dirname(fullpath))
-		    except OSError as exc: # Guard against race condition
-		        if exc.errno != errno.EEXIST:
-		            raise
+		makedir(fullpath)
 
 		with open("../analyzed_data/" + filepath + "/random_subset" + str(numappend) + ".txt", 'w') as randomsubsetfile:
 			randomsubsetfile.write(datstr if verboseLog else datstr_concise)
@@ -260,7 +267,7 @@ def random_subsets_over_n(startSize = 5, endSize = 500, stepSize = 5, numItersPe
 			thefile.write("All spearmans:\n" + str(spearmans) + "\n\n")
 			thefile.write("All standard errors:\n" + str(standarderrors) + "\n\n")
 
-def full_data_analyses():
+def full_oneshot_data_analyses():
 	#use person 0 for now, as it does not matter
 	person = people[0]
 	ntrials = len(person["oneshots"])
@@ -285,6 +292,110 @@ def full_data_analyses():
 
 	return pearsons, spearmans
 
-#random_subsets_over_n(log = True, numItersPer = 1, numPeoplePer = 1)
+def full_game_analysis(verbose = False):
+	alpha = 0.1
+	iters = 0
 
-analyze_times_seen()
+	#second is optimal, first is context insensitive
+	models = [RandomN_averaged(9, 5, 100), RandomN_averaged(9, 30, 100), RandomN_averaged(9, 100, 100)]
+	randoms = [0, 1, 2]
+	curtemp = np.ones(len(models))
+
+	filepath = "random_objects_chosen"
+	filepath += "-" + time.strftime("%m:%d:%Y-%H:%M:%S")
+
+	with open("../analyzed_data/fullgame_analysis/"+filepath, 'w') as logfile:
+		for r in randoms:
+			logfile.write(repr((models[r].get_simulated_people())) + "\n\n")
+
+	def softmax(raw_arr, heat):
+		exp = np.array( [ math.exp(heat * v) for v in raw_arr] )
+		return exp / np.sum(exp)
+
+	def gradient(raw_arr, heat, choice):
+		grad = 0
+		grad += raw_arr[choice]
+		grad -= sum([v * math.exp(heat * v) for v in raw_arr])/ \
+				sum([math.exp(heat * v) for v in raw_arr])
+
+		return grad
+
+	eig_vecs = []
+	for f in fullgames:
+		eig_vec = []
+		item_name = f[0]
+		item_indx = f[1]
+		knowledge = []
+		for q in f[2]:
+			for m in models[1:]:
+				m.knowledge = knowledge
+			for m in models:
+				m.update_all()
+
+
+			question_options_int = q["QuestionOptions_int"]
+			choice_str = q["Choice_str"]
+			choice_index = int(q["choice_index"])
+
+			eig = np.array([[m.expected_gain(f) for f in question_options_int] for m in models])
+			eig = normalize(eig)
+			eig_vec.append(eig)
+			resp = q["Resp"]
+			k = (question_options_int[choice_index], resp)
+			knowledge.append(k)
+
+		eig_vecs.append(eig_vec)
+
+	while True:
+		logprob = np.zeros((10, len(models)))
+		numsamples = np.zeros(np.shape(logprob))
+		grad = np.zeros(len(models))
+		for f, eig_vec in zip(fullgames, eig_vecs):
+			
+			knowledge = []
+
+			for q, eig in zip(f[2], eig_vec):
+
+				question_options_int = q["QuestionOptions_int"]
+				choice_str = q["Choice_str"]
+				choice_index = int(q["choice_index"])
+
+				smax = np.array([softmax(expected_gains, heat) for expected_gains, heat in zip(eig, curtemp)])
+				#print smax
+				grad += np.array([gradient(expected_gains, heat, choice_index) for expected_gains, heat in zip(eig, curtemp)])
+				
+				logprob[len(knowledge)] += np.array([math.log(smax[m][choice_index]) for m in range(len(models))])
+				numsamples[len(knowledge)] += np.ones(len(models))
+				
+				if verbose:
+					print '\n', [(features[feat] + " " + str(resp)) for feat, resp in knowledge]
+					print [features[feat] for feat in question_options_int]
+					print choice_index, item_name
+					print eig
+					print smax
+					print np.array([math.log(smax[m][choice_index]) for m in range(len(models))])
+					print logprob
+
+				resp = q["Resp"]
+				k = (question_options_int[choice_index], resp)
+				knowledge.append(k)
+
+			#print logprob
+
+		print "\n*********\nIterations:", iters
+		print "Log probability by depth: \n", logprob /  numsamples
+		print "Log probability overall:", np.sum(logprob, axis=0) / np.sum(numsamples, axis=0)
+		print "Num by depth:\n", numsamples
+		print "\nGradient vector: ", grad
+		print "Old temperature: ", curtemp
+
+		curtemp += alpha * grad
+		print "New temperature: ", curtemp
+
+		iters += 1
+
+
+
+#random_subsets_over_n(log = True, numItersPer = 1, numPeoplePer = 1)
+#analyze_times_seen()
+full_game_analysis()

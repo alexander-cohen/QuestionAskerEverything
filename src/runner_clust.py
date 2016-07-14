@@ -80,6 +80,7 @@ class ClustPlayer(OptimalPlayer): #ALL ITEMS AND FEATURES WILL BE REFERRED TO BY
         #print "shape:", np.shape(self.data_probs), np.shape(other)
         print "part 5:", time.time() - t
         '''
+
     def load_new_prob_matrix(self, clust_indx):
         self.clusts_index = all_clust_matrix[clust_indx][0]
         self.clusts = [np.where(np.array(self.clusts_index) == val)[0] for val in list(set(self.clusts_index))]
@@ -95,7 +96,7 @@ class ClustPlayer(OptimalPlayer): #ALL ITEMS AND FEATURES WILL BE REFERRED TO BY
         for i, c in zip(range(len(items)), self.clusts_index):
             self.data_probs[:,i,:] = self.data_probs_clust[:,c,:]
         
- 
+
     def prob_knowledge_from_clust(self, indx):
         clust_probs = self.data_probs_clust[:, indx] #a 2D slice of the array, rows being prob and column being feature
         prior = float(len(self.clusts[indx])) / float(len(items))
@@ -158,7 +159,7 @@ def which_cluster(clusters, item):
     for clust_index, c in zip(range(len(clusters)), clusters):
         if item in c: return clust_index
     if item == 0: print "Could not find:", items[item], item, item in clusters[2], '\n', '\n'.join([repr(list(elem)) for elem in clusters])
- 
+
 
 
 '''
@@ -227,5 +228,7 @@ print player.prob_response("WOULD YOU FIND IT IN A ZOO?", -1.0)
 #print expected[features.index("DOES IT MAKE A SOUND?")]
 '''
 
+'''
 player = ClustPlayer(9)
 player.play_game()
+'''

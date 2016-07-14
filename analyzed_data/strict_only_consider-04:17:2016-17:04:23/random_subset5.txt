@@ -1,5 +1,7 @@
 100 trials ran. 25 simulated people per trial. 5 objects per simulated person.
 
+
+
 Average pearson (by: trial number):
 [ 0.84696666  0.26745741  0.70858873  0.68979895 -0.0614554   0.11811281
   0.81634112  0.45715385 -0.31482553  0.84360072]

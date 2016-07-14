@@ -5,8 +5,8 @@ Created on Sep 5, 2015
 '''
 analyze_randomchoice = False
 analyzes = False
-analyze_fullgame = True
-analyze_fullgame_probs = False
+analyze_fullgame = False
+analyze_fullgame_probs = True
 import random
 from runner_randchoice import RandchoicePlayer
 from runner_randomN import *
@@ -85,6 +85,7 @@ class Fullgame:
         #print "item:", self.item
         self.questions = []
         self.ranksum = 0.0
+        self.all_eig = []
         #self.questions_seen = self.get_questions_seen()
     
     def get_questions_seen(self):
@@ -267,14 +268,20 @@ class Fullgame:
 
     def optimize(self, curtemp, randobjects):
         self.models = []
+        first_time = True
+        if len(self.all_eig) > 0: first_time = False
+        print first_time
+        #print first_time, self.all_eig
         #self.models.append( ["fullbayesian", ClustPlayer(9), np.zeros(10, dtype=np.float16)] )
 
 #         for i in range(9, -1, -1):
 #             self.models.append( ["clust" + str(i), ClustPlayer(i), np.zeros(10, dtype = np.float16), np.zeros(10, dtype = np.float16)] )
         #first is optimal, second is context insensitive
-        self.models = [ClustPlayer(9), ClustPlayer(9), \
+        '''self.models = [ClustPlayer(9), ClustPlayer(9), \
                        RandchoicePlayer(9, 20), RandomN(9, rands=randobjects), \
                        ClustPlayer(9)]
+        '''
+        self.models = [ClustPlayer(9)]
 
         self.gradient = [0 for m in self.models]
         self.sumtotal = [[0 for m in self.models] for d in range(10)]
@@ -284,8 +291,11 @@ class Fullgame:
         depth = 0
         #print "New Game:", self.item
         question_index = 0
-        for arr in self.game[1]:
+        real_index = -1
+        for arr, game_index in zip(self.game[1], range(10000)):
             if arr[0] == '20q_choice':
+                real_index += 1
+                if first_time: eig_instance = []
                 question_index += 1
                 choice = arr[1][3]
                 resp = float(arr[1][4])
@@ -294,7 +304,7 @@ class Fullgame:
                 questionarr = [e[0] for e in questionarr]
                 
                 rank = questionarr.index(choice)
-                indx = questionarr.index(choice)
+                indx = rank
                 self.questions.append( (questionarr, indx, resp) )
                 self.ranksum += rank
                 
@@ -312,41 +322,55 @@ class Fullgame:
                     val = math.e**(heat*choice) / np.sum([ math.e**(heat*c) for c in total ])
                     return val
                 
-                for m, i in zip(self.models[:1] + self.models[2:], range(1000)):
-                    m.knowledge.append(k)
-                    m.update_all()
+                
+                #self.models[1].knowledge = []
+                #self.models[1].update_all()
+               
                     
-                self.models[1].knowledge = []
-                self.models[1].update_all()
-
-                    
-                normal = np.array([self.models[0].expected_gain(f) for f in options_bynum])
-                normal -= np.min(normal)
-                normal /= np.sum(normal)
                 for m, i in zip(self.models, range(1000)):
-                    infogains = np.array([m.expected_gain(f) for f in options_bynum])
-                    infogains -= np.min(infogains)
-                    infogains /= np.max(infogains)
+                    
+                    if first_time:
+                        infogains = np.array([m.expected_gain(f) for f in options_bynum])
+                        #print '\n', m.knowledge
+                        #print options_bynum
+                        #print infogains
+                        eig_instance.append(infogains)
+                        #print "eig computed manually", first_time, self.all_eig
+                    else: 
+                        #print "use stored eig", first_time
+                        infogains = self.all_eig[real_index][i]
+                    
                     chosen_val = infogains[indx]
                     
                     gradient_component = gradient(chosen_val, infogains, curtemp[i])
                     softmax_value = softmax(chosen_val, infogains, curtemp[i])
-                    
+                    #if len(m.knowledge) == 0: print softmax_value
                     
                     self.gradient[i] += gradient_component
                     self.sumtotal[depth][i] += math.log(softmax_value)
                     self.numtotal[depth][i] += 1.0
                     
-                    spearman = scistats.spearmanr(normal, infogains)[0]
+                    spearman = 0
                     self.sumspear[depth][i] += spearman
                     self.numspear[depth][i] += 1.0
                     
                     
                     
                     #print gradient_component, self.gradient[i], self.gradient
+                if first_time:
+                    for m, i in zip(self.models, range(1000)):
+                        m.knowledge.append(k)
+                        m.update_all()
+                        
 
                 depth += 1
-           
+            
+                if first_time: self.all_eig.append(eig_instance)
+        
+        if first_time:
+            pass
+            #print self.all_eig
+
         return np.array(self.gradient), np.array(self.sumtotal), np.array(self.numtotal), np.array(self.sumspear), np.array(self.numspear)
 
 class Trial:
@@ -631,46 +655,54 @@ elif analyze_fullgame:
     print "Net probs:", sumprobs/numprobs
     print "Average Spearman:", sumspearman/numspearman, sumspearman, numspearman
     '''
-    curtemp = np.ones(5)
+    num_models = 1
+    curtemp = np.ones((23, num_models))
     curtemp *= 1
     
-    alpha = 0.01
+    alpha = 0.05
     iters = 0
     
     rand20 = random.sample(range(1000), 20)
+    
+    allgames = []
+    for datapiece in data:
+        #print "\n-------------------\nNew Person\n"
+        p = Person(datapiece)
+        games = p.fullgames
+        allgames.append(games)
+
     while True:
-        sumprobs = np.array([np.zeros(5) for d in range(10)])
-        numprobs = np.array([np.zeros(5) for d in range(10)])
-        sumspear = np.array([np.zeros(5) for d in range(10)])
-        numspear = np.array([np.zeros(5) for d in range(10)])
+        sumprobs = np.array([np.zeros(num_models) for d in range(10)])
+        numprobs = np.array([np.zeros(num_models) for d in range(10)])
+        sumspear = np.array([np.zeros(num_models) for d in range(10)])
+        numspear = np.array([np.zeros(num_models) for d in range(10)])
         print "\nIteration started:", iters+1 
         print "Current Temperature:", curtemp
-        gradient = np.zeros(5)
-        for datapiece in data:
-            #print "\n-------------------\nNew Person\n"
-            p = Person(datapiece)
-            games = p.fullgames
+        gradient = np.zeros(num_models)
+        
             
-            
+        for games, pindex in zip(allgames, range(1000)):
             for f in games:
-                grad_inc, sumtot, numtot, sums, nums = f.optimize(curtemp, rand20)
+                grad_inc, sumtot, numtot, sums, nums = f.optimize(curtemp[pindex], rand20)
                 sumprobs += sumtot
                 numprobs += numtot
                 sumspear += sums
                 numspear += nums
                 gradient += grad_inc
+                curtemp[pindex] += alpha * grad_inc
                 #print "Gradient added:", gradient
                 #print ''
                 
-        print "\nTotal Gradient:", gradient
-        print "\nTo Add:", alpha*gradient
-        curtemp += alpha*gradient
-        print "\nNew Temp:", curtemp
-        print "\nCurrent sums:", sumprobs
-        print "\nCurrent nums:", numprobs
-        print "\nCurrent probs:", sumprobs/numprobs
-        print "\nAverage spear:", sumspear/numspear
-        print '\n**********************\n'
+        #print "\nTotal Gradient:", gradient
+        #print "\nTo Add:", alpha*gradient
+        #curtemp += alpha*gradient
+        #print "\nNew Temp:", curtemp
+        #print "\nCurrent sums:", sumprobs
+        #print "\nCurrent nums:", numprobs
+        print "\nCurrent probs:\n", sumprobs/numprobs
+        print "\nAverage prob:", np.sum(sumprobs, axis=0) / np.sum(numprobs, axis=0)
+        #print "\nAverage spear:", sumspear/numspear
+        #print '\n**********************\n'
         iters += 1
         
 #note: prob is 193/401
@@ -787,9 +819,9 @@ else:
             trialstr += "QuestionAnswerPairs:" + str(qa) + "\n"
             trialstr += "Depth:" + str(depth) + "\n"
             trialstr += "Knowledge:" + str(knowledge) + "\n"
-
+            print depth
             oneshotstr += trialstr
-
+        print '\n', order, '\n\n'
         personstr += oneshotstr
 
         fulldatafile.write("9999\n")

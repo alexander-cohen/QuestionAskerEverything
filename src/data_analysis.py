@@ -14,9 +14,10 @@ from runner_clust import *
 from get_serverdata import *
 import scipy.stats as scistats
 from get_serverdata import *
+from confirmation_bias_model import *
 
 
-fsize = 70
+fsize = 45
                   
 font = {'family' : 'normal',
                 'size'   : fsize}
@@ -121,26 +122,46 @@ if not testing_times_seen:
         print len(trial[0].expected)
         #for indx in range(8):
         for indx in range(1):
+            model = PositiveBiasModel(9)
+            knowledge = [ (int(e[0]), float(e[1])) for e in trial[0].qa ]
+            model.knowledge = knowledge
+            model.update_all()
+
+            model2 = ClustPlayer(9)
+            knowledge = [ (int(e[0]), float(e[1])) for e in trial[0].qa ]
+            model2.knowledge = knowledge
+            model2.update_all()
+
+
+            #expected = np.array(trial[0].expected[i])
+            expected = [model.expected_gain(int(feat)) for feat in trial[0].questions]
+
+            '''
+            person = [model2.expected_gain(int(feat)) for feat in trial[0].questions]
+            person = np.array(person)
+            person -= np.min(person)
+            person /= np.max(person)
+            person *= 5
+            person = list(person)
+            '''
             
-            
-       
             #curplot = axarr[x][y]
             curplot = axarr
             if indx == 7 or indx == 8: print ''
             #i = indx if indx != 6 else 16
             i = indx
             #print i
-            compare = np.array(trial[0].expected[i])
+            compare = np.array(expected)
             ordered = [sorted(compare, key = lambda x: x)[::-1].index(elem) for elem in compare]
             thresh = 10
             ordered = [thresh if elem >= thresh else elem for elem in ordered]
             #print np.argmax(trial[0].expected[i]), np.argmin(matrx[0]), matrx[0]
-            chanceGuess = np.average([1 if np.argmin(vec) == np.argmax(trial[0].expected[i]) else 0 for vec in matrx])
-            isBest = np.argmax(person) == np.argmax(trial[0].expected[i])
+            chanceGuess = np.average([1 if np.argmin(vec) == np.argmax(expected) else 0 for vec in matrx])
+            isBest = np.argmax(person) == np.argmax(expected)
             
             normed = True
             
-            expected = np.array(trial[0].expected[i])
+            
             reallynormed = expected - np.min(expected)
             reallynormed /= np.max(reallynormed)
             
@@ -174,7 +195,7 @@ if not testing_times_seen:
             curplot.set_xlim(newX)
             curplot.set_ylim(newY)
             
-            isBest = np.argmax(person) == np.argmax(trial[0].expected[i])
+            isBest = np.argmax(person) == np.argmax(expected)
             
             display_text = True
             if display_text:
@@ -240,7 +261,7 @@ if not testing_times_seen:
         '''
         #f.set_title("Trial " + str(trial_index))
         print "saving:", trial_index
-        f.savefig("new_plots/Trial_" + str(trial_index) + "_ticks_lettered.pdf")
+        f.savefig("new_plots_confirmation_bias/Trial_" + str(trial_index) + "_ticks_lettered.pdf")
         #axarr.set_title("Trial " + str(trial_index))
         #f.show()
         #f.close()
@@ -324,6 +345,19 @@ def calcfor(clustindx):
                 matrx = np.array([t.rankorder for t in trial])
                 they_saw = [times_seen[i][int(q)] for q in trial[0].questions]
                 they_saw = trial[0].expected[0]
+                
+                model = ClustPlayer(9)
+
+                knowledge = [ (int(e[0]), float(e[1])) for e in trial[0].qa ]
+                print "\nknowledge:", knowledge, trial[0].qa
+                model.knowledge = knowledge
+                model.update_all()
+                new_eig = [model.expected_gain(int(f)) for f in trial[0].questions]
+                print "questions: ", trial[0].questions
+                print "former eig:", they_saw
+                print "new eig:", new_eig
+                they_saw = new_eig
+
                 #matrx[matrx >= 2] = 2
                 person = [5-x for x in np.average(matrx, axis=0)]
                 person = [5-x for x in matrx[i]]

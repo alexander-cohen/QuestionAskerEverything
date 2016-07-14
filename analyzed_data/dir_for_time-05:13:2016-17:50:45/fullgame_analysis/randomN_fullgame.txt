@@ -1,0 +1,11 @@
+Temperature:
+[4.4152109005488214]
+
+Log probability by depth:
+[array([-1.67737347]), array([-1.75035401]), array([-1.72839423]), array([-1.7793151]), array([-1.72112141]), array([-1.77337238]), array([-1.73590205]), array([-1.75328928]), array([-1.58555356])]
+
+Log probability overall:
+[-1.7301164038774586]
+
+Num by depth:
+[array([ 92.]), array([ 91.]), array([ 87.]), array([ 85.]), array([ 69.]), array([ 53.]), array([ 39.]), array([ 30.]), array([ 25.])]

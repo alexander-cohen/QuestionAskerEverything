@@ -4,7 +4,7 @@ import ast
 import re
 import cPickle as pickle
 
-with open("datalogs/fulldata.txt", 'r') as fulldatafile:
+with open("datalogs/fulldata_correctorder.txt", 'r') as fulldatafile:
 	data = fulldatafile.read()
 
 data = data.replace('\n', '|')
@@ -98,21 +98,20 @@ def getDataAsDicts(data):
 
 people, fgames, oneshots = getDataAsDicts(data)
 
-with open("datalogs/peopledata.pickle", 'w') as peopledatapicklefile:
+with open("datalogs/peopledata_correctorder.pickle", 'w') as peopledatapicklefile:
 	pickle.dump(people, peopledatapicklefile)
 
-with open("datalogs/peopledata.txt", 'w') as peopledatatextfile:
+with open("datalogs/peopledata_correctorder.txt", 'w') as peopledatatextfile:
 	pickle.dump(str(people), peopledatatextfile)
 
-with open("datalogs/fullgamedata.pickle", 'w') as fullgamedatapicklefile:
+with open("datalogs/fullgamedata_correctorder.pickle", 'w') as fullgamedatapicklefile:
 	pickle.dump(fgames, fullgamedatapicklefile)
 
-with open("datalogs/fullgamedata.txt", 'w') as fullgamedatatextfile:
+with open("datalogs/fullgamedata_correctorder.txt", 'w') as fullgamedatatextfile:
 	pickle.dump(str(fgames), fullgamedatatextfile)
 
-
-with open("datalogs/oneshotdata.pickle", 'w') as oneshotdatapicklefile:
+with open("datalogs/oneshotdata_correctorder.pickle", 'w') as oneshotdatapicklefile:
 	pickle.dump(oneshots, oneshotdatapicklefile)
 
-with open("datalogs/oneshotdata.txt", 'w') as oneshotdatatextfile:
+with open("datalogs/oneshotdata_correctorder.txt", 'w') as oneshotdatatextfile:
 	pickle.dump(str(oneshots), oneshotdatatextfile)

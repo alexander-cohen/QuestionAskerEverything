@@ -59,13 +59,13 @@ class RandomN_averaged():
                 strict_only_consider) for i in range(n_simulated_people)]
 
     def update_all(self):
-        pool = Pool()
+        #pool = Pool()
 
         for p in self.simulated_people:
             p.knowledge = self.knowledge
 
-        pool.map(updater, self.simulated_people)
-        pool.close()
+        map(updater, self.simulated_people)
+        #pool.close()
 
     def expected_gain(self, question):
         return np.average(  [p.expected_gain(question) for p in self.simulated_people] )

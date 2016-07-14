@@ -60,6 +60,7 @@ full_probability_matrix_madeup = [[0.60, 0.25, 0.09, 0.04, 0.02 ],
 
 all_probs = [np.zeros(np.shape(data_matrix)) for x in range(5)]
 
+'''
 for i in range(5):
     p = (float(i)/2.0) - 1.0
     
@@ -70,6 +71,7 @@ for i in range(5):
 
 all_probs = np.array(all_probs)
 all_probs.dump("../pickled_data/data_probs.pickle")
+'''
 
 with open("../pickled_data/data_probs.pickle", 'r') as d_probs:
     data_probs_temp = pickle.load(d_probs)
@@ -91,9 +93,11 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         
         self.features_left = range(len(features)) #features are referred to by index, this is the features we cn still choose
         
+        '''
         for f in feature_blacklist:
             self.features_left.remove(features.index(f)) #remove bad features
-        
+        '''
+
         self.probabilities = np.tile(self.prior_prob, self.num_items_left) #for now, everything has prior prob
         
         self.prob_knowledge_from_items = np.tile(1.0, self.num_items_left) #empty knowledge set, so 1.0 prob
@@ -173,15 +177,25 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         for k in self.knowledge:
             if k[0] == feature: return 0
             
-        eig = 0
+        eig = 0 
+        log_str = features[feature] + "\n"
         for i in range(5):
-            eig += self.prob_response(feature, index_to_prob(i)) * self.info_gain_ent(self.entropy_with_new_knowledge((feature, index_to_prob(i))))
+            prob_resp = self.prob_response(feature, index_to_prob(i)) 
+            info_gain =  self.info_gain_ent(self.entropy_with_new_knowledge((feature, index_to_prob(i))))
+            val = prob_resp * info_gain
+            log_str += "{:.3} * {:.3} = {:.3}\n".format(prob_resp, info_gain, val)
+            eig += val
+
+
+        log_str += "Total: {:.3}\n".format(eig)
+        log_str += "Alternate: {:.3}\n".format(self.prob_response(feature, 1.0))
+
+        #print log_str, '\n'
+
         return  eig
                             
     def expected_gains(self):
-        return_arr = []
-        for f in self.features_left:
-            return_arr.append(self.expected_gain(f))
+        return_arr = [self.expected_gain(f) for f in self.features_left]
         return np.nan_to_num(np.array(return_arr))                                                 
                                                             
     def get_best_feature(self):
@@ -210,6 +224,16 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
                     print 'For', o.upper(), ':', data_matrix[items.index(o.lower()), k[0]]
                 except:
                     pass
+
+        print '\n'
+
+        for o in choices:
+                try:
+                    print 'Cur probability for', o.upper(), ':', self.probabilities[items.index(o.lower())]
+                except:
+                    pass
+
+        print '\n\n'
               
     def info_gain_ent(self, new_entropy):
         return self.entropy - new_entropy
@@ -287,7 +311,7 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
     
     def query_dat_name(self, feat, itm = None):
         answer = self.query_dat_indx(feat, items.index(itm))
-        print features[feat], ' ', answer
+        #print features[feat], ' ', answer
         return answer
     
     def guess_threshes(self):
@@ -320,14 +344,14 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         t = time.time()
         if query_func == None: query_func = self.query_person_indx
         
-        print self
+        #print self
         #best_feature, gain = self.get_best_feature_and_gain()
         gains = self.expected_gains()
               
         best_feature = self.features_left[np.argmax(gains)] 
   
         gain = np.max(gains)
-        print self.helper_str(best_feature)
+        #print self.helper_str(best_feature)
             #print "Best gain: ", gain
             #print self.helper_str(best_feature)
         t1 = time.time() - t
@@ -336,13 +360,15 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
         t = time.time()
         self.knowledge.append((best_feature, resp))    
         
+        '''
         if not print_for_test:
             self.features_left.remove(best_feature)
-            
+        '''
+
         self.question_num += 1
         self.update_all()
         t2 = time.time() - t
-        print "time to iterate:", t1+t2
+        #print "time to iterate:", t1+t2
         return best_feature, gains
         
     def play_game(self):
@@ -376,7 +402,7 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
     
     def __str__(self):
         ordered = sorted([(items[self.items_left[i]], prob) for i, prob in zip(range(10000), self.probabilities)], key=lambda x: -x[1])
-        to_print_probs = repr([(item, "{:.3}%".format(prob*100)) for item, prob in ordered][:10])
+        to_print_probs = repr([(item, "{:.3}%".format(prob*100)) for item, prob in ordered][:1000])
         #to_print_probs = "err"
         #if print_for_test:
         #    return ""
@@ -387,6 +413,8 @@ class OptimalPlayer(object): #ALL itemS AND FEATURES WILL BE REFERRED TO BY INDE
             return "\nProbabilities: " + to_print_probs + "\n" \
                     "Entropy: " + str(self.entropy) + '\n' +\
                     "Questions asked: " + str(self.question_num)
+        else:
+            return ""
 
 
 
